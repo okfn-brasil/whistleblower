@@ -1,0 +1,2 @@
+git+https://github.com/datasciencebr/serenata-toolbox.git#egg=serenata-toolbox
+python-twitter==3.2.1

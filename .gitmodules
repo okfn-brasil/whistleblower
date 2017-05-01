@@ -1,0 +1,3 @@
+[submodule "rosie"]
+	path = rosie
+	url = git@github.com:datasciencebr/rosie.git
