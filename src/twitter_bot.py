@@ -37,10 +37,11 @@ def post_reimbursement(reimbursement):
         link = 'https://jarbas.serenatadeamor.org/#/documentId/{}'.format(
             reimbursement['document_id'])
         message = (
-            '🚨Gasto suspeito de Dep. @{}. '
+            '🚨Gasto suspeito de Dep. @{} ({}). '
             'Você pode me ajudar a verificar? '
             '{} #SerenataDeAmor'
-        ).format(handle, link)
+        ).format(handle, reimbursement['state_x'], link)
+        post(message)
     else:
         raise ValueError('Congressperson does not have a registered Twitter account.')
 
