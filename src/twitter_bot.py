@@ -18,7 +18,7 @@ ACCOUNTS = pd.read_csv('data/twitter_accounts.csv')
 def follow_congresspeople():
     handlers = pd.concat([ACCOUNTS['twitter_handle'],
                           ACCOUNTS['secondary_twitter_handle']])
-        for handler in handlers[handlers.notnull()].values:
+    for handler in handlers[handlers.notnull()].values:
         try:
             API.CreateFriendship(screen_name=handler)
         except Exception as e:
