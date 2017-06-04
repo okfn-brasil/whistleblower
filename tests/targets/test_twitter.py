@@ -52,16 +52,23 @@ class TestPost(TestCase):
 
     def setUp(self):
         self.api = mock.MagicMock()
-        self.reimbursement = mock.MagicMock(
-            congressperson_name='Eduardo Cunha',
-            document_id=10,
-            state_x='RJ',
-            twitter_profile='DepEduardoCunha')
-        self.subject = Post(self.reimbursement, api=self.api)
+        self.database = mock.MagicMock()
+        self.reimbursement = {
+            'congressperson_name': 'Eduardo Cunha',
+            'document_id': 10,
+            'state_x': 'RJ',
+            'twitter_profile': 'DepEduardoCunha',
+        }
+        self.subject = Post(self.reimbursement,
+                            api=self.api,
+                            database=self.database)
 
     def test_publish(self):
         self.subject.publish()
         self.api.PostUpdate.assert_called_once_with(self.subject.text())
+        dict_representation = self.subject.__dict__()
+        self.database.posts.insert_one.assert_called_once_with(
+            dict_representation)
 
     def test_text(self):
         message = (
@@ -70,6 +77,6 @@ class TestPost(TestCase):
             'https://jarbas.serenatadeamor.org/#/documentId/10 #SerenataDeAmor'
         )
         self.assertEqual(message, self.subject.text())
-        self.reimbursement.twitter_profile = None
+        self.reimbursement['twitter_profile'] = None
         with self.assertRaises(ValueError):
             self.subject.text()

@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -10,12 +11,14 @@ ACCESS_TOKEN_KEY = os.environ['TWITTER_ACCESS_TOKEN_KEY']
 ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 CONSUMER_KEY = os.environ['TWITTER_CONSUMER_KEY']
 CONSUMER_SECRET = os.environ['TWITTER_CONSUMER_SECRET']
+MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://mongo:27017/')
+MONGO_DATABASE = os.environ.get('MONGO_DATABASE', 'whistleblower')
 
 API = twitter.Api(consumer_key=CONSUMER_KEY,
                   consumer_secret=CONSUMER_SECRET,
                   access_token_key=ACCESS_TOKEN_KEY,
                   access_token_secret=ACCESS_TOKEN_SECRET)
-DATABASE = MongoClient('mongodb://mongo:27017/')['whistleblower']
+DATABASE = MongoClient(MONGO_URL)[MONGO_DATABASE]
 PROFILES_FILE = 'data/twitter_profiles.csv'
 
 
@@ -32,6 +35,13 @@ class Twitter:
         self.database = database
         self.profiles_file = profiles_file
         self._profiles = None
+
+    def post_queue(self, reimbursements):
+        """
+        Given a list of reimbursements, return just those not yet posted.
+        """
+        rows = ~reimbursements.document_id.isin(self.posted_reimbursements())
+        return reimbursements[rows]
 
     def profiles(self):
         """
@@ -67,23 +77,37 @@ class Post:
     Representation of a single reimbursement inside Twitter.
     """
 
-    def __init__(self, reimbursement, api=API):
+    def __init__(self, reimbursement, api=API, database=DATABASE):
         self.api = api
+        self.database = database
         self.reimbursement = reimbursement
+
+    def __dict__(self):
+        created_at = datetime.datetime.utcfromtimestamp(
+            self.status.created_at_in_seconds)
+        return {
+            'integration': 'chamber_of_deputies',
+            'target': 'twitter',
+            'id': self.status.id,
+            'screen_name': self.status.user.screen_name,
+            'created_at': created_at,
+            'text': self.status.text,
+            'document_id': self.reimbursement['document_id'],
+        }
 
     def text(self):
         """
         Proper tweet message for the given reimbursement.
         """
-        profile = self.reimbursement.twitter_profile
+        profile = self.reimbursement['twitter_profile']
         if profile:
             link = 'https://jarbas.serenatadeamor.org/#/documentId/{}'.format(
-                self.reimbursement.document_id)
+                self.reimbursement['document_id'])
             message = (
                 '🚨Gasto suspeito de Dep. @{} ({}). '
                 'Você pode me ajudar a verificar? '
                 '{} #SerenataDeAmor'
-            ).format(profile, self.reimbursement.state_x, link)
+            ).format(profile, self.reimbursement['state_x'], link)
             return message
         else:
             raise ValueError(
@@ -93,4 +117,5 @@ class Post:
         """
         Post the update to Twitter's timeline.
         """
-        return self.api.PostUpdate(self.text())
+        self.status = self.api.PostUpdate(self.text())
+        self.database.posts.insert_one(self.__dict__())
