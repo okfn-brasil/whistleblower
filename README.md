@@ -1,10 +1,19 @@
 # Whistleblower
 
-*Still under development. Although all the pieces seem to properly work separately, the code isn't 100% connected. There isn't - yet - a single command to run and get suspicious reimbursements to a Twitter account.*
-
 Follow [@RosieDaSerenata](https://twitter.com/RosieDaSerenata) to get Brazilian Chamber of Deputies' updates in your timeline.
 
 ## Setup
+
+If you're willing to use [Docker](https://www.docker.com) and [Docker Compose](https://docs.docker.com/compose/):
+
+```console
+$ git clone --recursive git@github.com:Irio/whistleblower.git
+$ cd whistleblower
+$ cp .env.example .env
+$ docker-compose build
+```
+
+Otherwise, use [Anaconda](https://www.continuum.io), a Python distribution:
 
 ```console
 $ git clone --recursive git@github.com:Irio/whistleblower.git
@@ -17,7 +26,14 @@ $ ./rosie/setup
 
 ## Running
 
+```console
+$ docker-compose run worker python whistleblower/get_dataset.py
+$ docker-compose run worker python rosie/rosie.py run chamber_of_deputies data
+$ docker-compose up
 ```
-$ python src/dataset.py
-$ python rosie/rosie.py run chamber_of_deputies data
+
+## Testing
+
+```console
+$ docker-compose run worker python -m unittest discover tests
 ```

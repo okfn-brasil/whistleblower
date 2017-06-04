@@ -1,3 +1,8 @@
 git+https://github.com/datasciencebr/serenata-toolbox.git#egg=serenata-toolbox
+amqp==2.1.4
+celery==4.0.2
+ipdb==0.10.3
+ipython==6.1.0
 pandas==0.19.2
+pymongo==3.4.0
 python-twitter==3.2.1

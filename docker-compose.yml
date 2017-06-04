@@ -1,0 +1,28 @@
+version: "3"
+services:
+  mongo:
+    image: mongo:3.5.7
+    ports:
+      - 27017:27017
+
+  rabbitmq:
+    image: rabbitmq:3.6.9
+    ports:
+      - 5672:5672
+
+  worker:
+    build: .
+    command: celery -A whistleblower.tasks worker -B
+    depends_on:
+      - mongo
+      - rabbitmq
+    env_file:
+      - .env
+    environment:
+      - CLOUDAMQP_URL=pyamqp://guest:guest@rabbitmq:5672//
+      - MONGO_DATABASE=whistleblower
+      - MONGO_URL=mongodb://mongo:27017/
+    volumes:
+      - ./data:/usr/src/app/data
+      - ./whistleblower:/usr/src/app/whistleblower
+      - ./tests:/usr/src/app/tests
