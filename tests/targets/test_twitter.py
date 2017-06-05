@@ -92,9 +92,9 @@ class TestTwitter(TestCase):
     def test_posts(self):
         posts = [mock.MagicMock()]
         self.api.GetUserTimeline.return_value = posts
-        self.assertEqual(posts, self.subject.posts())
+        self.assertEqual([posts], list(self.subject.posts()))
         self.api.GetUserTimeline.assert_called_once_with(
-            screen_name='RosieDaSerenata')
+            screen_name='RosieDaSerenata', max_id=None)
 
 
 class TestPost(TestCase):
