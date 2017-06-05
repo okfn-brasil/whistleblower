@@ -1,6 +1,8 @@
 import datetime
 import logging
 import os
+import re
+import urllib.request
 
 import numpy as np
 import pandas as pd
@@ -29,6 +31,8 @@ class Twitter:
     Maintains the logic for posting suspicious reimbursements
     in a Twitter account.
     """
+
+    PROFILE = 'RosieDaSerenata'
 
     def __init__(self, api=API, database=DATABASE, profiles_file=PROFILES_FILE):
         self.api = api
@@ -71,6 +75,29 @@ class Twitter:
             except twitter.TwitterError:
                 logging.warning('{} profile not found'.format(profile))
 
+    def provision_database(self):
+        """
+        Persist database records for each of the already existing posts
+        in the Twitter timeline.
+        """
+        posts = map(self.__database_record_for_post, self.posts())
+        self.database.posts.insert_many(list(posts))
+
+    def posts(self):
+        """
+        Posts already in the Twitter timeline.
+        """
+        return self.api.GetUserTimeline(screen_name=self.PROFILE)
+
+    def __database_record_for_post(self, timeline_post):
+        url = re.search(r'(https://t.co/.+) ', timeline_post.text)[1]
+        req = urllib.request.Request(url, method='HEAD')
+        resp = urllib.request.urlopen(req)
+        reimbursement = {'document_id': int(resp.url.split('/')[-1])}
+        post = Post(reimbursement)
+        post.status = timeline_post
+        return dict(post)
+
 
 class Post:
     """
@@ -82,18 +109,16 @@ class Post:
         self.database = database
         self.reimbursement = reimbursement
 
-    def __dict__(self):
+    def __iter__(self):
         created_at = datetime.datetime.utcfromtimestamp(
             self.status.created_at_in_seconds)
-        return {
-            'integration': 'chamber_of_deputies',
-            'target': 'twitter',
-            'id': self.status.id,
-            'screen_name': self.status.user.screen_name,
-            'created_at': created_at,
-            'text': self.status.text,
-            'document_id': self.reimbursement['document_id'],
-        }
+        yield 'integration', 'chamber_of_deputies'
+        yield 'target', 'twitter'
+        yield 'id', self.status.id
+        yield 'screen_name', self.status.user.screen_name
+        yield 'created_at', created_at
+        yield 'text', self.status.text
+        yield 'document_id', self.reimbursement['document_id']
 
     def text(self):
         """
@@ -118,4 +143,4 @@ class Post:
         Post the update to Twitter's timeline.
         """
         self.status = self.api.PostUpdate(self.text())
-        self.database.posts.insert_one(self.__dict__())
+        self.database.posts.insert_one(dict(self))
