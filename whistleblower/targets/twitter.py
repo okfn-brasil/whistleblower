@@ -80,23 +80,38 @@ class Twitter:
         Persist database records for each of the already existing posts
         in the Twitter timeline.
         """
-        posts = map(self.__database_record_for_post, self.posts())
-        self.database.posts.insert_many(list(posts))
+        for posts_chunk in self.posts():
+            posts = map(self.__database_record_for_post, posts_chunk)
+            posts = [post for post in posts if post]
+            self.database.posts.insert_many(posts)
 
     def posts(self):
         """
-        Posts already in the Twitter timeline.
+        Posts already in the Twitter timeline. Paginates the results in lists
+        of 20 posts (given also to a Twitter API limitation).
         """
-        return self.api.GetUserTimeline(screen_name=self.PROFILE)
+        max_id = None
+        while True:
+            posts = self.api.GetUserTimeline(screen_name=self.PROFILE,
+                                             max_id=max_id)
+            if max_id != None:
+                posts = posts[1:]
+            if len(posts) > 0:
+                yield posts
+                max_id = posts[-1].id
+            if len(posts) < 20:
+                break
 
     def __database_record_for_post(self, timeline_post):
-        url = re.search(r'(https://t.co/.+) ', timeline_post.text)[1]
-        req = urllib.request.Request(url, method='HEAD')
-        resp = urllib.request.urlopen(req)
-        reimbursement = {'document_id': int(resp.url.split('/')[-1])}
-        post = Post(reimbursement)
-        post.status = timeline_post
-        return dict(post)
+        matches = re.search(r'(https://t.co/.+) ', timeline_post.text)
+        if matches:
+            url = matches[1]
+            req = urllib.request.Request(url, method='HEAD')
+            resp = urllib.request.urlopen(req)
+            reimbursement = {'document_id': int(resp.url.split('/')[-1])}
+            post = Post(reimbursement)
+            post.status = timeline_post
+            return dict(post)
 
 
 class Post:

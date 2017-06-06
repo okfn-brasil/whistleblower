@@ -15,6 +15,9 @@ class TestTwitter(TestCase):
         self.subject = Twitter(api=self.api, database=self.database)
 
     def test_profiles(self):
+        self.subject = Twitter(api=self.api,
+                               database=self.database,
+                               profiles_file='tests/fixtures/twitter_profiles.csv')
         self.assertIsInstance(self.subject.profiles(), pd.DataFrame)
 
     def test_posted_reimbursements(self):
@@ -92,9 +95,9 @@ class TestTwitter(TestCase):
     def test_posts(self):
         posts = [mock.MagicMock()]
         self.api.GetUserTimeline.return_value = posts
-        self.assertEqual(posts, self.subject.posts())
+        self.assertEqual([posts], list(self.subject.posts()))
         self.api.GetUserTimeline.assert_called_once_with(
-            screen_name='RosieDaSerenata')
+            screen_name='RosieDaSerenata', max_id=None)
 
 
 class TestPost(TestCase):
