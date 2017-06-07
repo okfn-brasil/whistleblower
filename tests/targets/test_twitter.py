@@ -126,7 +126,8 @@ class TestPost(TestCase):
         message = (
             '🚨Gasto suspeito de Dep. @DepEduardoCunha (RJ). '
             'Você pode me ajudar a verificar? '
-            'https://jarbas.serenatadeamor.org/#/documentId/10 #SerenataDeAmor'
+            'https://jarbas.serenatadeamor.org/#/documentId/10 '
+            '#SerenataDeAmor na @CamaraDeputados'
         )
         self.assertEqual(message, self.subject.text())
         self.reimbursement['twitter_profile'] = None
