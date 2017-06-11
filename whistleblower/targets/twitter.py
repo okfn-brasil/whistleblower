@@ -69,8 +69,8 @@ class Twitter:
         """
         Friend all congresspeople accounts on Twitter.
         """
-        profiles = pd.concat([self.profiles['twitter_profile'],
-                              self.profiles['secondary_twitter_profile']])
+        profiles = pd.concat([self.profiles()['twitter_profile'],
+                              self.profiles()['secondary_twitter_profile']])
         for profile in profiles[profiles.notnull()].values:
             try:
                 self.api.CreateFriendship(screen_name=profile)
