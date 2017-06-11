@@ -21,7 +21,7 @@ def enqueue_twitter_posts():
     for index in range(0, 4):
         reimbursement = json.loads(sample.iloc[index].to_json())
         delay = index * 4 * 3600
-        post_reimbursement_to_twitter.apply_async(args=[reimbursement],
+        post_reimbursement_to_twitter.apply_async([reimbursement],
                                                   countdown=delay)
 
 
