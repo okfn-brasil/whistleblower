@@ -101,7 +101,7 @@ class Twitter:
             if len(posts) > 0:
                 yield posts
                 max_id = posts[-1].id
-            if len(posts) < 20:
+            if len(posts) < 19:
                 break
 
     def __database_record_for_post(self, timeline_post):
