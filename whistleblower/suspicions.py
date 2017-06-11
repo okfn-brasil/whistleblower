@@ -11,6 +11,8 @@ class Suspicions:
     Load suspicious reimbursements.
     """
 
+    SOCIAL_ACCOUNTS_FILE = '2017-06-11-congresspeople-social-accounts.xz'
+
     def __init__(self, data_path=DATA_PATH):
         self.data_path = data_path
 
@@ -57,7 +59,7 @@ class Suspicions:
                            dtype={'applicant_id': np.str})
 
     def __twitter_profiles(self):
-        path = os.path.join(self.data_path, 'twitter_profiles.csv')
+        path = os.path.join(self.data_path, self.SOCIAL_ACCOUNTS_FILE)
         dataset = pd.read_csv(path, dtype={'congressperson_id': np.str})
         cols = ['twitter_profile', 'secondary_twitter_profile']
         return dataset[dataset[cols].any(axis=1)]
