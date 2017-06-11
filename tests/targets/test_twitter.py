@@ -17,7 +17,7 @@ class TestTwitter(TestCase):
     def test_profiles(self):
         self.subject = Twitter(api=self.api,
                                database=self.database,
-                               profiles_file='tests/fixtures/twitter_profiles.csv')
+                               profiles_file='tests/fixtures/congresspeople-social-accounts.csv')
         self.assertIsInstance(self.subject.profiles(), pd.DataFrame)
 
     def test_posted_reimbursements(self):

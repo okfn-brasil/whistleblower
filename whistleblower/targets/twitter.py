@@ -9,6 +9,8 @@ import pandas as pd
 from pymongo import MongoClient
 import twitter
 
+from whistleblower.suspicions import Suspicions
+
 ACCESS_TOKEN_KEY = os.environ['TWITTER_ACCESS_TOKEN_KEY']
 ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 CONSUMER_KEY = os.environ['TWITTER_CONSUMER_KEY']
@@ -21,7 +23,6 @@ API = twitter.Api(consumer_key=CONSUMER_KEY,
                   access_token_key=ACCESS_TOKEN_KEY,
                   access_token_secret=ACCESS_TOKEN_SECRET)
 DATABASE = MongoClient(MONGO_URL)[MONGO_DATABASE]
-PROFILES_FILE = 'data/twitter_profiles.csv'
 
 
 class Twitter:
@@ -34,7 +35,8 @@ class Twitter:
 
     PROFILE = 'RosieDaSerenata'
 
-    def __init__(self, api=API, database=DATABASE, profiles_file=PROFILES_FILE):
+    def __init__(self, api=API, database=DATABASE,
+                 profiles_file=Suspicions.SOCIAL_ACCOUNTS_FILE):
         self.api = api
         self.database = database
         self.profiles_file = profiles_file
