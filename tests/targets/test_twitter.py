@@ -36,7 +36,7 @@ class TestTwitter(TestCase):
             ['DepRodrigomaia', None],
             [None, None]
         ], columns=['twitter_profile', 'secondary_twitter_profile'])
-        self.subject.profiles = profiles
+        self.subject._profiles = profiles
         calls = [
             mock.call.CreateFriendship(screen_name='DepEduardoCunha'),
             mock.call.CreateFriendship(screen_name='DepEduardoCunha2'),
