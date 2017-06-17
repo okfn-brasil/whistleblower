@@ -1,3 +1,4 @@
+from datetime import date
 import os
 from urllib.request import urlretrieve
 from zipfile import ZipFile
@@ -8,6 +9,7 @@ from serenata_toolbox.xml2csv import convert_xml_to_csv
 
 PATH = 'data'
 URL = 'http://www.camara.gov.br/cotas/AnoAtual.zip'
+YEARS = [n for n in range(2015, date.today().year + 1)]
 
 
 class Reimbursements:
@@ -43,7 +45,7 @@ class Reimbursements:
     def read_csv(self, name):
         filepath = os.path.join(self.path, name)
         print('Loading {}…'.format(name))
-        return pd.read_csv(filepath, dtype=self.DTYPE)
+        return pd.read_csv(filepath, dtype=self.DTYPE, low_memory=False)
 
     @property
     def receipts(self):
@@ -125,124 +127,137 @@ class Reimbursements:
 
 
 def fetch():
+    base_url = 'http://www.camara.leg.br/cotas/Ano-{}.csv.zip'
+
+    for year in YEARS:
+        zip_file_path = os.path.join(PATH, 'Ano-{}.zip'.format(year))
+        url = base_url.format(year)
+        urlretrieve(url, zip_file_path)
+        zip_file = ZipFile(zip_file_path, 'r')
+        zip_file.extractall(PATH)
+        zip_file.close()
+        os.remove(zip_file_path)
+
     urlretrieve('http://www2.camara.leg.br/transparencia/cota-para-exercicio-da-atividade-parlamentar/explicacoes-sobre-o-formato-dos-arquivos-xml',
                 os.path.join(PATH, 'datasets-format.html'))
-    zip_file_path = os.path.join(PATH, 'AnoAtual')
-    urlretrieve(URL, zip_file_path)
-    zip_file = ZipFile(zip_file_path, 'r')
-    zip_file.extractall(PATH)
-    zip_file.close()
-    os.remove(zip_file_path)
 
 
 def convert_to_csv():
-    for filename in ['AnoAtual']:
+    for year in YEARS:
+        filename = 'Ano-{}.csv'.format(year)
         xml_path = os.path.join(PATH, '{}.xml'.format(filename))
         csv_path = xml_path.replace('.xml', '.csv')
         convert_xml_to_csv(xml_path, csv_path)
 
-def translate():
-    data = pd.read_csv(os.path.join(PATH, 'AnoAtual.csv'),
-                       dtype={'idedocumento': np.str,
-                              'idecadastro': np.str,
-                              'nucarteiraparlamentar': np.str,
-                              'codlegislatura': np.str,
-                              'txtcnpjcpf': np.str,
-                              'numressarcimento': np.str})
-    data.rename(columns={
-        'idedocumento': 'document_id',
-        'txnomeparlamentar': 'congressperson_name',
-        'idecadastro': 'congressperson_id',
-        'nucarteiraparlamentar': 'congressperson_document',
-        'nulegislatura': 'term',
-        'sguf': 'state',
-        'sgpartido': 'party',
-        'codlegislatura': 'term_id',
-        'numsubcota': 'subquota_number',
-        'txtdescricao': 'subquota_description',
-        'numespecificacaosubcota': 'subquota_group_id',
-        'txtdescricaoespecificacao': 'subquota_group_description',
-        'txtfornecedor': 'supplier',
-        'txtcnpjcpf': 'cnpj_cpf',
-        'txtnumero': 'document_number',
-        'indtipodocumento': 'document_type',
-        'datemissao': 'issue_date',
-        'vlrdocumento': 'document_value',
-        'vlrglosa': 'remark_value',
-        'vlrliquido': 'net_value',
-        'nummes': 'month',
-        'numano': 'year',
-        'numparcela': 'installment',
-        'txtpassageiro': 'passenger',
-        'txttrecho': 'leg_of_the_trip',
-        'numlote': 'batch_number',
-        'numressarcimento': 'reimbursement_number',
-        'vlrrestituicao': 'reimbursement_value',
-        'nudeputadoid': 'applicant_id',
-    }, inplace=True)
-    data['subquota_description'] = \
-        data['subquota_description'].astype('category')
 
-    categories = {
-        'ASSINATURA DE PUBLICAÇÕES':
-            'Publication subscriptions',
-        'COMBUSTÍVEIS E LUBRIFICANTES.':
-            'Fuels and lubricants',
-        'CONSULTORIAS, PESQUISAS E TRABALHOS TÉCNICOS.':
-            'Consultancy, research and technical work',
-        'DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR.':
-            'Publicity of parliamentary activity',
-        'Emissão Bilhete Aéreo':
-            'Flight ticket issue',
-        'FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR':
-            'Congressperson meal',
-        'HOSPEDAGEM ,EXCETO DO PARLAMENTAR NO DISTRITO FEDERAL.':
-            'Lodging, except for congressperson from Distrito Federal',
-        'LOCAÇÃO OU FRETAMENTO DE AERONAVES':
-            'Aircraft renting or charter of aircraft',
-        'LOCAÇÃO OU FRETAMENTO DE EMBARCAÇÕES':
-            'Watercraft renting or charter',
-        'LOCAÇÃO OU FRETAMENTO DE VEÍCULOS AUTOMOTORES':
-            'Automotive vehicle renting or charter',
-        'MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR':
-            'Maintenance of office supporting parliamentary activity',
-        'PARTICIPAÇÃO EM CURSO, PALESTRA OU EVENTO SIMILAR':
-            'Participation in course, talk or similar event',
-        'PASSAGENS AÉREAS':
-            'Flight tickets',
-        'PASSAGENS TERRESTRES, MARÍTIMAS OU FLUVIAIS':
-            'Terrestrial, maritime and fluvial tickets',
-        'SERVIÇO DE SEGURANÇA PRESTADO POR EMPRESA ESPECIALIZADA.':
-            'Security service provided by specialized company',
-        'SERVIÇO DE TÁXI, PEDÁGIO E ESTACIONAMENTO':
-            'Taxi, toll and parking',
-        'SERVIÇOS POSTAIS':
-            'Postal services',
-        'TELEFONIA':
-            'Telecommunication',
-        'AQUISIÇÃO DE MATERIAL DE ESCRITÓRIO.':
-            'Purchase of office supplies',
-        'AQUISIÇÃO OU LOC. DE SOFTWARE; SERV. POSTAIS; ASS.':
-            'Software purchase or renting; Postal services; Subscriptions',
-        'LOCAÇÃO DE VEÍCULOS AUTOMOTORES OU FRETAMENTO DE EMBARCAÇÕES ':
-            'Automotive vehicle renting or watercraft charter',
-        'LOCOMOÇÃO, ALIMENTAÇÃO E  HOSPEDAGEM':
-            'Locomotion, meal and lodging',
-    }
-    categories = [categories[cat] for cat in data['subquota_description'].cat.categories]
-    data['subquota_description'].cat.rename_categories(categories, inplace=True)
-    data.to_csv(os.path.join(PATH, 'reimbursements.xz'),
-                compression='xz',
-                index=False,
-                encoding='utf-8')
+def translate():
+    for year in YEARS:
+        filename = 'Ano-{}.csv'.format(year)
+        data = pd.read_csv(os.path.join(PATH, filename),
+                           dtype={'idedocumento': np.str,
+                                  'idecadastro': np.str,
+                                  'nucarteiraparlamentar': np.str,
+                                  'codlegislatura': np.str,
+                                  'txtcnpjcpf': np.str,
+                                  'numressarcimento': np.str},
+                           low_memory=False,
+                           sep=';')
+        data.columns = [col.lower() for col in data.columns]
+        data.rename(columns={
+            'idedocumento': 'document_id',
+            'txnomeparlamentar': 'congressperson_name',
+            'idecadastro': 'congressperson_id',
+            'nucarteiraparlamentar': 'congressperson_document',
+            'nulegislatura': 'term',
+            'sguf': 'state',
+            'sgpartido': 'party',
+            'codlegislatura': 'term_id',
+            'numsubcota': 'subquota_number',
+            'txtdescricao': 'subquota_description',
+            'numespecificacaosubcota': 'subquota_group_id',
+            'txtdescricaoespecificacao': 'subquota_group_description',
+            'txtfornecedor': 'supplier',
+            'txtcnpjcpf': 'cnpj_cpf',
+            'txtnumero': 'document_number',
+            'indtipodocumento': 'document_type',
+            'datemissao': 'issue_date',
+            'vlrdocumento': 'document_value',
+            'vlrglosa': 'remark_value',
+            'vlrliquido': 'net_value',
+            'nummes': 'month',
+            'numano': 'year',
+            'numparcela': 'installment',
+            'txtpassageiro': 'passenger',
+            'txttrecho': 'leg_of_the_trip',
+            'numlote': 'batch_number',
+            'numressarcimento': 'reimbursement_number',
+            'vlrrestituicao': 'reimbursement_value',
+            'nudeputadoid': 'applicant_id',
+        }, inplace=True)
+        data['subquota_description'] = \
+            data['subquota_description'].astype('category')
+
+        categories = {
+            'ASSINATURA DE PUBLICAÇÕES':
+                'Publication subscriptions',
+            'COMBUSTÍVEIS E LUBRIFICANTES.':
+                'Fuels and lubricants',
+            'CONSULTORIAS, PESQUISAS E TRABALHOS TÉCNICOS.':
+                'Consultancy, research and technical work',
+            'DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR.':
+                'Publicity of parliamentary activity',
+            'Emissão Bilhete Aéreo':
+                'Flight ticket issue',
+            'FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR':
+                'Congressperson meal',
+            'HOSPEDAGEM ,EXCETO DO PARLAMENTAR NO DISTRITO FEDERAL.':
+                'Lodging, except for congressperson from Distrito Federal',
+            'LOCAÇÃO OU FRETAMENTO DE AERONAVES':
+                'Aircraft renting or charter of aircraft',
+            'LOCAÇÃO OU FRETAMENTO DE EMBARCAÇÕES':
+                'Watercraft renting or charter',
+            'LOCAÇÃO OU FRETAMENTO DE VEÍCULOS AUTOMOTORES':
+                'Automotive vehicle renting or charter',
+            'MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR':
+                'Maintenance of office supporting parliamentary activity',
+            'PARTICIPAÇÃO EM CURSO, PALESTRA OU EVENTO SIMILAR':
+                'Participation in course, talk or similar event',
+            'PASSAGENS AÉREAS':
+                'Flight tickets',
+            'PASSAGENS TERRESTRES, MARÍTIMAS OU FLUVIAIS':
+                'Terrestrial, maritime and fluvial tickets',
+            'SERVIÇO DE SEGURANÇA PRESTADO POR EMPRESA ESPECIALIZADA.':
+                'Security service provided by specialized company',
+            'SERVIÇO DE TÁXI, PEDÁGIO E ESTACIONAMENTO':
+                'Taxi, toll and parking',
+            'SERVIÇOS POSTAIS':
+                'Postal services',
+            'TELEFONIA':
+                'Telecommunication',
+            'AQUISIÇÃO DE MATERIAL DE ESCRITÓRIO.':
+                'Purchase of office supplies',
+            'AQUISIÇÃO OU LOC. DE SOFTWARE; SERV. POSTAIS; ASS.':
+                'Software purchase or renting; Postal services; Subscriptions',
+            'LOCAÇÃO DE VEÍCULOS AUTOMOTORES OU FRETAMENTO DE EMBARCAÇÕES ':
+                'Automotive vehicle renting or watercraft charter',
+            'LOCOMOÇÃO, ALIMENTAÇÃO E  HOSPEDAGEM':
+                'Locomotion, meal and lodging',
+        }
+        categories = [categories[cat] for cat in data['subquota_description'].cat.categories]
+        data['subquota_description'].cat.rename_categories(categories, inplace=True)
+        data.to_csv(os.path.join(PATH, 'reimbursements.xz'),
+                    compression='xz',
+                    index=False,
+                    encoding='utf-8')
+
 
 def clean():
     reimbursements = Reimbursements(PATH)
     dataset = reimbursements.group(reimbursements.receipts)
     reimbursements.write_reimbursement_file(dataset)
 
+
 if __name__ == '__main__':
     fetch()
-    convert_to_csv()
     translate()
     clean()
