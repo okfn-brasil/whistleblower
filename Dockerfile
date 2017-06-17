@@ -15,6 +15,7 @@ COPY rosie/requirements.txt ./rosie
 RUN pip install -r rosie/requirements.txt
 
 COPY . .
+RUN ./rosie/setup
 
 RUN useradd -ms /bin/bash serenata_de_amor
 RUN chown -hR serenata_de_amor .
