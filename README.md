@@ -4,24 +4,13 @@ Follow [@RosieDaSerenata](https://twitter.com/RosieDaSerenata) to get Brazilian 
 
 ## Setup
 
-If you're willing to use [Docker](https://www.docker.com) and [Docker Compose](https://docs.docker.com/compose/):
+Install [Docker](https://www.docker.com) and [Docker Compose](https://docs.docker.com/compose/).
 
 ```console
 $ git clone --recursive git@github.com:Irio/whistleblower.git
 $ cd whistleblower
 $ cp .env.example .env
 $ docker-compose build
-```
-
-Otherwise, use [Anaconda](https://www.continuum.io), a Python distribution:
-
-```console
-$ git clone --recursive git@github.com:Irio/whistleblower.git
-$ conda create --name serenata_whistleblower python=3
-$ conda activate serenata_whistleblower
-$ pip install -r requirements.txt
-$ cp .env.example .env
-$ ./rosie/setup
 ```
 
 ## Running

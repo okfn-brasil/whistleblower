@@ -5,7 +5,6 @@ from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
-from serenata_toolbox.xml2csv import convert_xml_to_csv
 
 PATH = 'data'
 URL = 'http://www.camara.gov.br/cotas/AnoAtual.zip'
