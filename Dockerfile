@@ -9,6 +9,7 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 COPY . .
+RUN ./rosie/setup
 
 RUN useradd -ms /bin/bash serenata_de_amor
 RUN chown -hR serenata_de_amor .
