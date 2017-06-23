@@ -141,14 +141,6 @@ def fetch():
                 os.path.join(PATH, 'datasets-format.html'))
 
 
-def convert_to_csv():
-    for year in YEARS:
-        filename = 'Ano-{}.csv'.format(year)
-        xml_path = os.path.join(PATH, '{}.xml'.format(filename))
-        csv_path = xml_path.replace('.xml', '.csv')
-        convert_xml_to_csv(xml_path, csv_path)
-
-
 def translate():
     for year in YEARS:
         filename = 'Ano-{}.csv'.format(year)
