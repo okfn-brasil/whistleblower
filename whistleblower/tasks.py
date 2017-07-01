@@ -7,6 +7,7 @@ from celery import Celery
 from celery.schedules import crontab
 
 from whistleblower.suspicions import Suspicions
+from whistleblower.targets.facebook_messenger import Post as MessengerPost
 from whistleblower.targets.twitter import Post as TwitterPost, Twitter
 
 rabbitmq_url = os.environ.get('CLOUDAMQP_URL', 'pyamqp://guest@localhost//')
@@ -48,4 +49,10 @@ def enqueue_twitter_posts():
 @app.task
 def post_reimbursement_to_twitter(reimbursement):
     post = TwitterPost(reimbursement)
+    post.publish()
+
+
+@app.task
+def post_reimbursement_to_messenger(reimbursement):
+    post = MessengerPost(reimbursement)
     post.publish()
