@@ -141,6 +141,7 @@ def fetch():
                 os.path.join(PATH, 'datasets-format.html'))
 
 
+
 def translate():
     for year in YEARS:
         filename = 'Ano-{}.csv'.format(year)
@@ -240,6 +241,7 @@ def translate():
                     compression='xz',
                     index=False,
                     encoding='utf-8')
+
 
 
 def clean():
