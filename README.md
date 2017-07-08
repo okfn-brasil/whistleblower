@@ -20,8 +20,7 @@ $ docker-compose build
 ## Running
 
 ```console
-$ docker-compose run worker python whistleblower/get_dataset.py
-$ docker-compose run worker python rosie/rosie.py run chamber_of_deputies data
+$ docker-compose run worker python rosie/rosie.py run chamber_of_deputies data --years=2017,2016
 $ docker-compose up
 ```
 
