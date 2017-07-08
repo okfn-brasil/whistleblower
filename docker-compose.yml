@@ -24,5 +24,6 @@ services:
       - MONGO_URL=mongodb://mongo:27017/
     volumes:
       - ./data:/usr/src/app/data
-      - ./whistleblower:/usr/src/app/whistleblower
+      - ./rosie:/usr/src/app/rosie
       - ./tests:/usr/src/app/tests
+      - ./whistleblower:/usr/src/app/whistleblower
