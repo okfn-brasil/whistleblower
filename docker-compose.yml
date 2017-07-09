@@ -12,17 +12,17 @@ services:
     expose:
       - "5672"
 
-  web:
-    build: web
-    restart: always
-    ports:
-      - 80:5000
-    depends_on:
-      - mongo
-    environment:
-      - FLASK_APP=server.py
-      - MONGO_DATABASE=whistleblower
-      - MONGO_URL=mongodb://mongo:27017/
+  # web:
+  #   build: web
+  #   restart: always
+  #   ports:
+  #     - 80:5000
+  #   depends_on:
+  #     - mongo
+  #   environment:
+  #     - FLASK_APP=server.py
+  #     - MONGO_DATABASE=whistleblower
+  #     - MONGO_URL=mongodb://mongo:27017/
 
   worker:
     build: .
