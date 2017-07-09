@@ -19,6 +19,8 @@ services:
       - 80:5000
     depends_on:
       - mongo
+    env_file:
+      - .env
     environment:
       - FLASK_APP=server.py
       - FLASK_DEBUG=1
