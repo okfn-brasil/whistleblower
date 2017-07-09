@@ -25,13 +25,6 @@ def setup_periodic_tasks(sender, **kwargs):
 
 
 @app.task
-def update_suspicions_dataset():
-    command = ['python', 'rosie/rosie.py', 'run',
-               'chamber_of_deputies', 'data', '--years=2017,2016']
-    subprocess.run(command, check=True)
-
-
-@app.task
 def update_queue():
     whistleblower.queue.Queue().update()
 
