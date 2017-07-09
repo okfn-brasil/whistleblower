@@ -1,8 +1,6 @@
 import dateutil
 import os
 import re
-import urllib.parse as urlparse
-from urllib.parse import urlencode
 
 import numpy as np
 import pandas as pd
@@ -26,32 +24,16 @@ class FacebookMessenger:
     as a Facebook Messenger bot.
     """
 
+    NAME = 'facebook_messenger'
+
     def __init__(self, database=DATABASE):
         self.database = database
 
-    def post_queue(self, reimbursements):
+    def subscribers(self):
         """
-        Given a list of reimbursements, return just those not yet posted.
+        List of Facebook users who chose to receive posts.
         """
-        rows = ~reimbursements.document_id.isin(self.posted_reimbursements())
-        return reimbursements[rows]
-
-    def posted_reimbursements(self):
-        """
-        List of document_id's already posted in the account.
-        """
-        results = self.database.posts.find({'target': 'facebook_messenger'},
-                                           {'document_id': True})
-        return np.r_[[post['document_id'] for post in results]]
-
-    def provision_database(self):
-        raise NotImplementedError
-
-    def posts(self):
-        raise NotImplementedError
-
-    def __database_record_for_post(self, post):
-        raise NotImplementedError
+        return ['1382735351782042']
 
 
 class Post:
@@ -65,9 +47,9 @@ class Post:
     ).format(PAGE_ACCESS_TOKEN)
 
     def __init__(self, reimbursement, database=DATABASE):
-        self._profile_url = None
         self.database = database
         self.reimbursement = reimbursement
+        self._profile_url = None
 
     def message(self):
         """
@@ -112,30 +94,37 @@ class Post:
         }
 
     def title(self):
-        congressperson = self.reimbursement['congressperson_name_x'].title()
+        """
+        Title for the post.
+        """
+        congressperson = self.reimbursement['congressperson_name'].title()
         return '🚨 Gasto suspeito de Dep. {} ({})'.format(
-            congressperson, self.reimbursement['state_x'])
+            congressperson, self.reimbursement['state'])
 
     def picture_url(self):
-        if self._profile_url is None:
-            url = self.congressperson_page_url().replace('www.', 'graph.')
-            url_parts = list(urlparse.urlparse(url))
-            query = dict(urlparse.parse_qsl(url_parts[4]))
-            query['fields'] = 'picture.type(large)'
-            url_parts[4] = urlencode(query)
-            request = requests.get(urlparse.urlunparse(url_parts))
-            self._profile_url = request.json()['picture']['data']['url']
-        return self._profile_url
+        """
+        Congressperson's picture URL.
+        """
+        return self.reimbursement['picture_url']
 
     def link(self):
+        """
+        URL to get more information about the reimbursement.
+        """
         return 'https://jarbas.serenatadeamor.org/#/documentId/{}'.format(
             self.reimbursement['document_id'])
 
     def congressperson_page_url(self):
+        """
+        URL for congressperson's official Facebook representation.
+        """
         if self.reimbursement['facebook_page']:
             return self.reimbursement['facebook_page']
 
     def phone_number(self):
+        """
+        Phone number to contact the congressperson.
+        """
         if self.reimbursement['phone_number']:
             return '+55 (61) {}'.format(self.reimbursement['phone_number'])
 
@@ -143,11 +132,8 @@ class Post:
         """
         Post the message to all available conversations.
         """
-        for recipient in self.subscribers():
+        for recipient in FacebookMessenger().subscribers():
             self.publish_to_recipient(recipient)
-
-    def subscribers(self):
-        return ['1382735351782042']
 
     def publish_to_recipient(self, recipient):
         """
@@ -170,5 +156,5 @@ class Post:
             'message_id': json_request['message_id'],
             'message': self.message(),
             'recipient_id': json_request['recipient_id'],
-            'target': 'facebook_messenger',
+            'target': FacebookMessenger.NAME,
         }

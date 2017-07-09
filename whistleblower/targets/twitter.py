@@ -33,6 +33,7 @@ class Twitter:
     in a Twitter account.
     """
 
+    NAME = 'twitter'
     PROFILE = 'RosieDaSerenata'
 
     def __init__(self, api=API, database=DATABASE,
@@ -61,7 +62,7 @@ class Twitter:
         """
         List of document_id's already posted in the account.
         """
-        results = self.database.posts.find({'target': 'twitter'},
+        results = self.database.posts.find({'target': self.NAME},
                                            {'document_id': True})
         return np.r_[[post['document_id'] for post in results]]
 
@@ -130,7 +131,7 @@ class Post:
         created_at = datetime.datetime.utcfromtimestamp(
             self.status.created_at_in_seconds)
         yield 'integration', 'chamber_of_deputies'
-        yield 'target', 'twitter'
+        yield 'target', Twitter.NAME
         yield 'id', self.status.id
         yield 'screen_name', self.status.user.screen_name
         yield 'created_at', created_at
