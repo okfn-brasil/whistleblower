@@ -15,7 +15,8 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/facebook_webhook', methods=['POST'])
+# @app.route('/facebook_webhook', methods=['POST'])
+@app.route('/facebook_webhook')
 def facebook_webhook():
     DATABASE.facebook_webhook.insert(request.form)
     return ('', http.client.NO_CONTENT)
