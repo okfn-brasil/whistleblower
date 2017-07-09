@@ -14,7 +14,7 @@ touch /home/serenata_de_amor/running.txt
 sudo -u serenata_de_amor bash << EOF
 
 cd /home/serenata_de_amor/whistleblower
-nohup docker-compose up -d --ignore-override
+nohup docker-compose -f docker-compose.yml up &
 
 EOF
 EOL
