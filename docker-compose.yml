@@ -2,17 +2,33 @@ version: "3"
 services:
   mongo:
     image: mongo:3.5.9
+    restart: always
     ports:
       - 27017:27017
 
   rabbitmq:
     image: rabbitmq:3.6.10
+    restart: always
     ports:
       - 5672:5672
+
+  web:
+    build: web
+    restart: always
+    ports:
+      - 80:5000
+    depends_on:
+      - mongo
+    environment:
+      - FLASK_APP=server.py
+      - FLASK_DEBUG=1
+      - MONGO_DATABASE=whistleblower
+      - MONGO_URL=mongodb://mongo:27017/
 
   worker:
     build: .
     command: celery -A whistleblower.tasks worker -B
+    restart: always
     depends_on:
       - mongo
       - rabbitmq
