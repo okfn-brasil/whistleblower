@@ -1,3 +1,8 @@
+# Configure SSH access
+# source: https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04
+#
+# ----------
+
 useradd -ms /bin/bash serenata_de_amor
 git clone --recursive https://github.com/datasciencebr/whistleblower.git /home/serenata_de_amor/whistleblower
 chown -hR serenata_de_amor /home/serenata_de_amor/whistleblower
