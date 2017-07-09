@@ -3,10 +3,14 @@ services:
   mongo:
     image: mongo:3.5.9
     restart: always
+    expose:
+      - "27017"
 
   rabbitmq:
     image: rabbitmq:3.6.10
     restart: always
+    expose:
+      - "5672"
 
   web:
     build: web
