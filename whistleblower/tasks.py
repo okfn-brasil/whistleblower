@@ -6,53 +6,42 @@ import subprocess
 from celery import Celery
 from celery.schedules import crontab
 
-from whistleblower.suspicions import Suspicions
-from whistleblower.targets.facebook_messenger import Post as MessengerPost
-from whistleblower.targets.twitter import Post as TwitterPost, Twitter
+from .targets.facebook_messenger import Post as MessengerPost
+from .targets.twitter import Post as TwitterPost
+import whistleblower.queue
 
-rabbitmq_url = os.environ.get('CLOUDAMQP_URL', 'pyamqp://guest@localhost//')
-app = Celery('tasks', broker=rabbitmq_url)
+HOUR = 3600
+ENABLED_TARGETS = [
+    TwitterPost,
+    MessengerPost,
+]
+RABBITMQ_URL = os.environ.get('CLOUDAMQP_URL', 'pyamqp://guest@localhost//')
+app = Celery('tasks', broker=RABBITMQ_URL)
 
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(
-        crontab(hour=3),
-        update_suspicions_dataset.s()
-    )
-    sender.add_periodic_task(
-        crontab(hour=13),
-        enqueue_twitter_posts.s()
-    )
+    sender.add_periodic_task(4 * HOUR, process_queue.s())
 
 
 @app.task
 def update_suspicions_dataset():
-    subprocess.run(['python', 'whistleblower/get_dataset.py'], check=True)
-    subprocess.run(['python', 'rosie/rosie.py', 'run',
-                    'chamber_of_deputies', 'data'], check=True)
+    command = ['python', 'rosie/rosie.py', 'run',
+               'chamber_of_deputies', 'data', '--years=2017,2016']
+    subprocess.run(command, check=True)
 
 
 @app.task
-def enqueue_twitter_posts():
-    reimbursements = Suspicions().all()
-    queue = Twitter().post_queue(reimbursements)
-    logging.info('Queue for Twitter: {} reimbursements'.format(len(queue)))
-    sample = queue.sample(4)
-    for index in range(0, 4):
-        reimbursement = json.loads(sample.iloc[index].to_json())
-        delay = index * 4 * 3600
-        post_reimbursement_to_twitter.apply_async([reimbursement],
-                                                  countdown=delay)
+def update_queue():
+    whistleblower.queue.Queue().update()
 
 
 @app.task
-def post_reimbursement_to_twitter(reimbursement):
-    post = TwitterPost(reimbursement)
-    post.publish()
+def process_queue():
+    whistleblower.queue.Queue().process()
 
 
 @app.task
-def post_reimbursement_to_messenger(reimbursement):
-    post = MessengerPost(reimbursement)
-    post.publish()
+def publish_reimbursement(reimbursement):
+    for target in ENABLED_TARGETS:
+        target(reimbursement).publish()
