@@ -3,14 +3,10 @@ services:
   mongo:
     image: mongo:3.5.9
     restart: always
-    ports:
-      - 27017:27017
 
   rabbitmq:
     image: rabbitmq:3.6.10
     restart: always
-    ports:
-      - 5672:5672
 
   web:
     build: web
@@ -19,11 +15,8 @@ services:
       - 80:5000
     depends_on:
       - mongo
-    env_file:
-      - .env
     environment:
       - FLASK_APP=server.py
-      - FLASK_DEBUG=1
       - MONGO_DATABASE=whistleblower
       - MONGO_URL=mongodb://mongo:27017/
 
@@ -40,8 +33,3 @@ services:
       - CLOUDAMQP_URL=pyamqp://guest:guest@rabbitmq:5672//
       - MONGO_DATABASE=whistleblower
       - MONGO_URL=mongodb://mongo:27017/
-    volumes:
-      - ./data:/usr/src/app/data
-      - ./rosie:/usr/src/app/rosie
-      - ./tests:/usr/src/app/tests
-      - ./whistleblower:/usr/src/app/whistleblower
