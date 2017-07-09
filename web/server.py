@@ -10,7 +10,7 @@ DATABASE = MongoClient(MONGO_URL)[MONGO_DATABASE]
 app = Flask(__name__)
 
 
-@app.route('/facebook_weebhook', methods=['POST'])
-def facebook_weebhook():
-    DATABASE.facebook_weebhook.insert(request.form)
+@app.route('/facebook_webhook', methods=['POST'])
+def facebook_webhook():
+    DATABASE.facebook_webhook.insert(request.form)
     return ('', http.client.NO_CONTENT)
