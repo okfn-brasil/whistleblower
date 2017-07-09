@@ -30,21 +30,23 @@ class Suspicions:
         dataset = dataset.merge(self.__companies(),
                                 how='left',
                                 left_on='cnpj_cpf',
-                                right_on='cnpj')
-        dataset = dataset.merge(self.__suspicions())
+                                right_on='cnpj',
+                                suffixes=('', '_company'))
+        dataset = dataset.merge(self.__suspicions(),
+                                suffixes=('', '_suspicion'))
         dataset = dataset.merge(self.__social_accounts(),
                                 how='left',
-                                on='congressperson_id')
+                                on='congressperson_id',
+                                suffixes=('', '_social_account'))
         dataset = dataset.merge(self.__congresspeople(),
                                 how='left',
-                                on='congressperson_id')
-        # rows = dataset.iloc[:, -6:].any(axis=1) \
-        #     & dataset.congressperson_id.notnull()
+                                on='congressperson_id',
+                                suffixes=('', '_congressperson'))
         suspicious_cols = ['meal_price_outlier',
                            'suspicious_traveled_speed_day']
         rows = dataset.loc[:, suspicious_cols].any(axis=1) \
-            & dataset.congressperson_id.notnull()
-        return dataset[rows].sort_values('total_net_value', ascending=False)
+            & dataset['congressperson_id'].notnull()
+        return dataset.loc[rows, dataset.notnull().any()]
 
     def __reimbursements(self):
         dataset = pd.read_csv(os.path.join(self.data_path, 'reimbursements.xz'),
@@ -65,7 +67,7 @@ class Suspicions:
         dataset['cnpj'] = dataset['cnpj'].str.replace(r'\D', '')
         dataset['situation_date'] = pd.to_datetime(
             dataset['situation_date'], errors='coerce')
-        return dataset
+        return dataset.iloc[:, :-2]  # Drop duplicated columns
 
     def __suspicions(self):
         return pd.read_csv(os.path.join(self.data_path, 'suspicions.xz'),

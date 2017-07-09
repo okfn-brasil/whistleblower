@@ -108,7 +108,7 @@ class TestPost(TestCase):
         self.reimbursement = {
             'congressperson_name': 'Eduardo Cunha',
             'document_id': 10,
-            'state_x': 'RJ',
+            'state': 'RJ',
             'twitter_profile': 'DepEduardoCunha',
         }
         self.subject = Post(self.reimbursement,

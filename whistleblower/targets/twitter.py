@@ -149,7 +149,7 @@ class Post:
                 '🚨Gasto suspeito de Dep. @{} ({}). '
                 'Você pode me ajudar a verificar? '
                 '{} #SerenataDeAmor na @CamaraDeputados'
-            ).format(profile, self.reimbursement['state_x'], link)
+            ).format(profile, self.reimbursement['state'], link)
             return message
         else:
             raise ValueError(
