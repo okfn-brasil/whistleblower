@@ -13,10 +13,3 @@ services:
   #     - 80:5000
   #   env_file:
   #     - .env
-
-  worker:
-    volumes:
-      - ./data:/usr/src/app/data
-      - ./rosie:/usr/src/app/rosie
-      - ./tests:/usr/src/app/tests
-      - ./whistleblower:/usr/src/app/whistleblower
