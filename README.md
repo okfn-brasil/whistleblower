@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/lipemorais/whistleblower.svg?branch=master)](https://travis-ci.org/lipemorais/whistleblower)
+[![Build Status](https://travis-ci.org/datasciencebr/whistleblower.svg?branch=master)](https://travis-ci.org/datasciencebr/whistleblower)
 
 # Whistleblower
 
