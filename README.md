@@ -1,3 +1,5 @@
+[![Code Health](https://landscape.io/github/lipemorais/whistleblower/master/landscape.svg?style=flat)](https://landscape.io/github/lipemorais/whistleblower/master)
+
 # Whistleblower
 
 Follow [@RosieDaSerenata](https://twitter.com/RosieDaSerenata) to get Brazilian Chamber of Deputies' updates in your timeline.
