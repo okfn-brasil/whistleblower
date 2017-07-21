@@ -1,4 +1,4 @@
-[![Code Health](https://landscape.io/github/lipemorais/whistleblower/master/landscape.svg?style=flat)](https://landscape.io/github/lipemorais/whistleblower/master)
+[![Code Health](https://landscape.io/github/datasciencebr/whistleblower/master/landscape.svg?style=flat)](https://landscape.io/github/datasciencebr/whistleblower/master)
 
 # Whistleblower
 
