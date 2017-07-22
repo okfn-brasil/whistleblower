@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/datasciencebr/whistleblower.svg?branch=master)](https://travis-ci.org/datasciencebr/whistleblower)
 
+[![Code Health](https://landscape.io/github/datasciencebr/whistleblower/master/landscape.svg?style=flat)](https://landscape.io/github/datasciencebr/whistleblower/master)
+
 # Whistleblower
 
 Follow [@RosieDaSerenata](https://twitter.com/RosieDaSerenata) to get Brazilian Chamber of Deputies' updates in your timeline.
