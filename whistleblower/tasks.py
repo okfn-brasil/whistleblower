@@ -6,14 +6,12 @@ import subprocess
 from celery import Celery
 from celery.schedules import crontab
 
-from .targets.facebook_messenger import Post as MessengerPost
 from .targets.twitter import Post as TwitterPost
 import whistleblower.queue
 
 HOUR = 3600
 ENABLED_TARGETS = [
     TwitterPost,
-    MessengerPost,
 ]
 RABBITMQ_URL = os.environ.get('CLOUDAMQP_URL', 'pyamqp://guest@localhost//')
 app = Celery('tasks', broker=RABBITMQ_URL)
