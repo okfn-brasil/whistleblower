@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/datasciencebr/whistleblower.svg?branch=master)](https://travis-ci.org/datasciencebr/whistleblower)
-
 [![Code Health](https://landscape.io/github/datasciencebr/whistleblower/master/landscape.svg?style=flat)](https://landscape.io/github/datasciencebr/whistleblower/master)
+[![Coverage Status](https://coveralls.io/repos/github/datasciencebr/whistleblower/badge.svg?branch=master)](https://coveralls.io/github/datasciencebr/whistleblower?branch=master)
 
 # Whistleblower
 
