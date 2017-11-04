@@ -1,13 +1,13 @@
 version: "3"
 services:
   mongo:
-    image: mongo:3.5.9
+    image: mongo:3.5.13
     restart: always
     expose:
       - "27017"
 
   rabbitmq:
-    image: rabbitmq:3.6.10
+    image: rabbitmq:3.6.12
     restart: always
     expose:
       - "5672"
