@@ -7,9 +7,3 @@ services:
   rabbitmq:
     ports:
       - 5672:5672
-
-  # web:
-  #   ports:
-  #     - 80:5000
-  #   env_file:
-  #     - .env
