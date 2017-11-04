@@ -9,6 +9,8 @@ import pandas as pd
 from pymongo import MongoClient
 import twitter
 
+from whistleblower.suspicions import Suspicions
+
 ACCESS_TOKEN_KEY = os.environ['TWITTER_ACCESS_TOKEN_KEY']
 ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 CONSUMER_KEY = os.environ['TWITTER_CONSUMER_KEY']
@@ -21,7 +23,6 @@ API = twitter.Api(consumer_key=CONSUMER_KEY,
                   access_token_key=ACCESS_TOKEN_KEY,
                   access_token_secret=ACCESS_TOKEN_SECRET)
 DATABASE = MongoClient(MONGO_URL)[MONGO_DATABASE]
-PROFILES_FILE = 'data/twitter_profiles.csv'
 
 
 class Twitter:
@@ -32,9 +33,11 @@ class Twitter:
     in a Twitter account.
     """
 
+    NAME = 'twitter'
     PROFILE = 'RosieDaSerenata'
 
-    def __init__(self, api=API, database=DATABASE, profiles_file=PROFILES_FILE):
+    def __init__(self, api=API, database=DATABASE,
+                 profiles_file=Suspicions.SOCIAL_ACCOUNTS_FILE):
         self.api = api
         self.database = database
         self.profiles_file = profiles_file
@@ -59,7 +62,7 @@ class Twitter:
         """
         List of document_id's already posted in the account.
         """
-        results = self.database.posts.find({'target': 'twitter'},
+        results = self.database.posts.find({'target': self.NAME},
                                            {'document_id': True})
         return np.r_[[post['document_id'] for post in results]]
 
@@ -67,8 +70,8 @@ class Twitter:
         """
         Friend all congresspeople accounts on Twitter.
         """
-        profiles = pd.concat([self.profiles['twitter_profile'],
-                              self.profiles['secondary_twitter_profile']])
+        profiles = pd.concat([self.profiles()['twitter_profile'],
+                              self.profiles()['secondary_twitter_profile']])
         for profile in profiles[profiles.notnull()].values:
             try:
                 self.api.CreateFriendship(screen_name=profile)
@@ -99,7 +102,7 @@ class Twitter:
             if len(posts) > 0:
                 yield posts
                 max_id = posts[-1].id
-            if len(posts) < 20:
+            if len(posts) < 19:
                 break
 
     def __database_record_for_post(self, timeline_post):
@@ -128,7 +131,7 @@ class Post:
         created_at = datetime.datetime.utcfromtimestamp(
             self.status.created_at_in_seconds)
         yield 'integration', 'chamber_of_deputies'
-        yield 'target', 'twitter'
+        yield 'target', Twitter.NAME
         yield 'id', self.status.id
         yield 'screen_name', self.status.user.screen_name
         yield 'created_at', created_at
@@ -147,7 +150,7 @@ class Post:
                 '🚨Gasto suspeito de Dep. @{} ({}). '
                 'Você pode me ajudar a verificar? '
                 '{} #SerenataDeAmor na @CamaraDeputados'
-            ).format(profile, self.reimbursement['state_x'], link)
+            ).format(profile, self.reimbursement['state'], link)
             return message
         else:
             raise ValueError(

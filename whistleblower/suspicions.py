@@ -3,6 +3,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from serenata_toolbox import datasets
+
 DATA_PATH = 'data'
 
 
@@ -11,25 +13,40 @@ class Suspicions:
     Load suspicious reimbursements.
     """
 
+    COMPANIES_FILE = '2016-09-03-companies.xz'
+    CONGRESSPEOPLE_FILE = '2017-05-29-deputies.xz'
+    SOCIAL_ACCOUNTS_FILE = '2017-06-11-congresspeople-social-accounts.xz'
+
     def __init__(self, data_path=DATA_PATH):
         self.data_path = data_path
+
+    def fetch(self):
+        datasets.fetch(self.COMPANIES_FILE, self.data_path)
+        datasets.fetch(self.CONGRESSPEOPLE_FILE, self.data_path)
+        datasets.fetch(self.SOCIAL_ACCOUNTS_FILE, self.data_path)
 
     def all(self):
         dataset = self.__reimbursements()
         dataset = dataset.merge(self.__companies(),
                                 how='left',
                                 left_on='cnpj_cpf',
-                                right_on='cnpj')
-        dataset = dataset.merge(self.__suspicions())
-        dataset = dataset.merge(self.__twitter_profiles(),
-                                on='congressperson_id')
-        # rows = dataset.iloc[:, -6:].any(axis=1) \
-        #     & dataset.congressperson_id.notnull()
+                                right_on='cnpj',
+                                suffixes=('', '_company'))
+        dataset = dataset.merge(self.__suspicions(),
+                                suffixes=('', '_suspicion'))
+        dataset = dataset.merge(self.__social_accounts(),
+                                how='left',
+                                on='congressperson_id',
+                                suffixes=('', '_social_account'))
+        dataset = dataset.merge(self.__congresspeople(),
+                                how='left',
+                                on='congressperson_id',
+                                suffixes=('', '_congressperson'))
         suspicious_cols = ['meal_price_outlier',
                            'suspicious_traveled_speed_day']
         rows = dataset.loc[:, suspicious_cols].any(axis=1) \
-            & dataset.congressperson_id.notnull()
-        return dataset[rows].sort_values('total_net_value', ascending=False)
+            & dataset['congressperson_id'].notnull()
+        return dataset.loc[rows, dataset.notnull().any()]
 
     def __reimbursements(self):
         dataset = pd.read_csv(os.path.join(self.data_path, 'reimbursements.xz'),
@@ -45,19 +62,21 @@ class Suspicions:
         return dataset
 
     def __companies(self):
-        path = os.path.join(self.data_path, '2016-09-03-companies.xz')
+        path = os.path.join(self.data_path, self.COMPANIES_FILE)
         dataset = pd.read_csv(path, dtype={'cnpj': np.str}, low_memory=False)
         dataset['cnpj'] = dataset['cnpj'].str.replace(r'\D', '')
         dataset['situation_date'] = pd.to_datetime(
             dataset['situation_date'], errors='coerce')
-        return dataset
+        return dataset.iloc[:, :-2]  # Drop duplicated columns
 
     def __suspicions(self):
         return pd.read_csv(os.path.join(self.data_path, 'suspicions.xz'),
                            dtype={'applicant_id': np.str})
 
-    def __twitter_profiles(self):
-        path = os.path.join(self.data_path, 'twitter_profiles.csv')
-        dataset = pd.read_csv(path, dtype={'congressperson_id': np.str})
-        cols = ['twitter_profile', 'secondary_twitter_profile']
-        return dataset[dataset[cols].any(axis=1)]
+    def __social_accounts(self):
+        path = os.path.join(self.data_path, self.SOCIAL_ACCOUNTS_FILE)
+        return pd.read_csv(path, dtype={'congressperson_id': np.str})
+
+    def __congresspeople(self):
+        path = os.path.join(self.data_path, self.CONGRESSPEOPLE_FILE)
+        return pd.read_csv(path, dtype={'congressperson_id': np.str})

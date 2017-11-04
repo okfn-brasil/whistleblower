@@ -17,7 +17,7 @@ class TestTwitter(TestCase):
     def test_profiles(self):
         self.subject = Twitter(api=self.api,
                                database=self.database,
-                               profiles_file='tests/fixtures/twitter_profiles.csv')
+                               profiles_file='tests/fixtures/congresspeople-social-accounts.csv')
         self.assertIsInstance(self.subject.profiles(), pd.DataFrame)
 
     def test_posted_reimbursements(self):
@@ -36,7 +36,7 @@ class TestTwitter(TestCase):
             ['DepRodrigomaia', None],
             [None, None]
         ], columns=['twitter_profile', 'secondary_twitter_profile'])
-        self.subject.profiles = profiles
+        self.subject._profiles = profiles
         calls = [
             mock.call.CreateFriendship(screen_name='DepEduardoCunha'),
             mock.call.CreateFriendship(screen_name='DepEduardoCunha2'),
@@ -108,7 +108,7 @@ class TestPost(TestCase):
         self.reimbursement = {
             'congressperson_name': 'Eduardo Cunha',
             'document_id': 10,
-            'state_x': 'RJ',
+            'state': 'RJ',
             'twitter_profile': 'DepEduardoCunha',
         }
         self.subject = Post(self.reimbursement,

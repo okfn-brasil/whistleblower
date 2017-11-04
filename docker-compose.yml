@@ -1,18 +1,21 @@
 version: "3"
 services:
   mongo:
-    image: mongo:3.5.7
-    ports:
-      - 27017:27017
+    image: mongo:3.5.9
+    restart: always
+    expose:
+      - "27017"
 
   rabbitmq:
-    image: rabbitmq:3.6.9
-    ports:
-      - 5672:5672
+    image: rabbitmq:3.6.10
+    restart: always
+    expose:
+      - "5672"
 
   worker:
     build: .
     command: celery -A whistleblower.tasks worker -B
+    restart: always
     depends_on:
       - mongo
       - rabbitmq
@@ -24,5 +27,6 @@ services:
       - MONGO_URL=mongodb://mongo:27017/
     volumes:
       - ./data:/usr/src/app/data
-      - ./whistleblower:/usr/src/app/whistleblower
+      - ./rosie:/usr/src/app/rosie
       - ./tests:/usr/src/app/tests
+      - ./whistleblower:/usr/src/app/whistleblower
