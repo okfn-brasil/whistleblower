@@ -25,8 +25,3 @@ services:
       - CLOUDAMQP_URL=pyamqp://guest:guest@rabbitmq:5672//
       - MONGO_DATABASE=whistleblower
       - MONGO_URL=mongodb://mongo:27017/
-    volumes:
-      - ./data:/usr/src/app/data
-      - ./rosie:/usr/src/app/rosie
-      - ./tests:/usr/src/app/tests
-      - ./whistleblower:/usr/src/app/whistleblower

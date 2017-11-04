@@ -12,3 +12,5 @@ RUN pip install -r requirements.txt
 RUN useradd -ms /bin/bash serenata_de_amor
 RUN chown -hR serenata_de_amor .
 USER serenata_de_amor
+
+COPY . /usr/src/app
