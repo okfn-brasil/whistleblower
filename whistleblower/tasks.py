@@ -19,7 +19,7 @@ app = Celery('tasks', broker=RABBITMQ_URL)
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(4 * HOUR, process_queue.s())
+    sender.add_periodic_task(3 * HOUR, process_queue.s())
 
 
 @app.task
