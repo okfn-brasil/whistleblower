@@ -1,9 +1,16 @@
-FROM python:3.6.1
+FROM python:3.6.3-alpine
 
-RUN mkdir rosie
-COPY rosie/config.ini.example ./config.ini
-COPY rosie/requirements.txt ./rosie
-RUN pip install -r rosie/requirements.txt
+RUN apk add --no-cache --virtual build-base \
+  && apk add --no-cache --virtual libxml2-dev \
+  && apk add --no-cache --virtual libxslt-dev \
+  && mkdir -p /usr/include/libxml \
+  && ln -s /usr/include/libxml2/libxml/xmlexports.h /usr/include/libxml/xmlexports.h \
+  && ln -s /usr/include/libxml2/libxml/xmlversion.h /usr/include/libxml/xmlversion.h
+
+# RUN mkdir rosie
+# COPY rosie/config.ini.example ./config.ini
+# COPY rosie/requirements.txt ./rosie
+# RUN pip install -r rosie/requirements.txt
 
 WORKDIR /usr/src/app
 COPY requirements.txt ./
