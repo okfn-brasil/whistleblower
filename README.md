@@ -30,3 +30,15 @@ $ docker-compose up
 ```console
 $ docker-compose run worker python -m unittest discover tests
 ```
+
+## Production
+
+Open a new shell session (by opening a new terminal window, for instance) and run the following snippet to setup a new virtual machine. After the eval, `docker-compose` commands in this session will be executed in the remote server, not your local environment.
+
+Create a [personal token at Digital Ocean](https://cloud.digitalocean.com/settings/api/tokens) and start setting it as an environment variable:
+
+```console
+$ export DIGITALOCEAN_ACCESS_TOKEN=<personal token>
+$ docker-machine create --driver digitalocean --digitalocean-size 2gb whistleblower
+$ eval $(docker-machine env whistleblower)
+```
