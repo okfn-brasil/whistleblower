@@ -15,14 +15,14 @@ ACCESS_TOKEN_KEY = os.environ['TWITTER_ACCESS_TOKEN_KEY']
 ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 CONSUMER_KEY = os.environ['TWITTER_CONSUMER_KEY']
 CONSUMER_SECRET = os.environ['TWITTER_CONSUMER_SECRET']
-MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://mongo:27017/')
+MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://mongo:27017/')
 MONGO_DATABASE = os.environ.get('MONGO_DATABASE', 'whistleblower')
 
 API = twitter.Api(consumer_key=CONSUMER_KEY,
                   consumer_secret=CONSUMER_SECRET,
                   access_token_key=ACCESS_TOKEN_KEY,
                   access_token_secret=ACCESS_TOKEN_SECRET)
-DATABASE = MongoClient(MONGO_URI)[MONGO_DATABASE]
+DATABASE = MongoClient(MONGODB_URI)[MONGO_DATABASE]
 
 
 class Twitter:
