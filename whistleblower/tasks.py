@@ -6,7 +6,7 @@ import subprocess
 from celery import Celery
 from celery.schedules import crontab
 
-from .targets.twitter import Post as TwitterPost
+from whistleblower.targets.twitter import Post as TwitterPost
 import whistleblower.queue
 
 HOUR = 3600

@@ -16,7 +16,7 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
-RUN useradd -ms /bin/bash serenata_de_amor
+RUN adduser -S serenata_de_amor
 RUN chown -hR serenata_de_amor .
 USER serenata_de_amor
 
