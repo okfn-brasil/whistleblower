@@ -144,7 +144,7 @@ class Post:
         """
         profile = self.reimbursement['twitter_profile']
         if profile:
-            link = 'https://jarbas.serenatadeamor.org/#/documentId/{}'.format(
+            link = 'https://jarbas.serenata.ai/layers/#/documentId/{}'.format(
                 self.reimbursement['document_id'])
             message = (
                 '🚨Gasto suspeito de Dep. @{} ({}). '
