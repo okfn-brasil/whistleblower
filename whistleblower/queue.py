@@ -7,9 +7,9 @@ from .suspicions import Suspicions
 from .targets.twitter import Twitter
 import whistleblower.tasks
 
-MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://mongo:27017/')
+MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://mongo:27017/')
 MONGO_DATABASE = os.environ.get('MONGO_DATABASE', 'whistleblower')
-DATABASE = MongoClient(MONGO_URL)[MONGO_DATABASE]
+DATABASE = MongoClient(MONGODB_URI)[MONGO_DATABASE]
 
 
 class Queue:

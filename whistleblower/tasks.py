@@ -6,7 +6,7 @@ import subprocess
 from celery import Celery
 from celery.schedules import crontab
 
-from .targets.twitter import Post as TwitterPost
+from whistleblower.targets.twitter import Post as TwitterPost
 import whistleblower.queue
 
 HOUR = 3600
@@ -19,7 +19,7 @@ app = Celery('tasks', broker=RABBITMQ_URL)
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(4 * HOUR, process_queue.s())
+    sender.add_periodic_task(1 * HOUR, process_queue.s())
 
 
 @app.task
