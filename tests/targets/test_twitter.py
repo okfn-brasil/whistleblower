@@ -126,7 +126,7 @@ class TestPost(TestCase):
         message = (
             '🚨Gasto suspeito de Dep. @DepEduardoCunha (RJ). '
             'Você pode me ajudar a verificar? '
-            'https://jarbas.serenatadeamor.org/#/documentId/10 '
+            'https://jarbas.serenata.ai/layers/#/documentId/10 '
             '#SerenataDeAmor na @CamaraDeputados'
         )
         self.assertEqual(message, self.subject.text())
