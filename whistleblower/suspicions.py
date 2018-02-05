@@ -15,7 +15,7 @@ class Suspicions:
 
     COMPANIES_FILE = '2016-09-03-companies.xz'
     CONGRESSPEOPLE_FILE = '2017-05-29-deputies.xz'
-    SOCIAL_ACCOUNTS_FILE = '2017-06-11-congresspeople-social-accounts.xz'
+    SOCIAL_ACCOUNTS_FILE = '2018-02-05-congresspeople-social-accounts.xz'
 
     def __init__(self, data_path=DATA_PATH):
         self.data_path = data_path
