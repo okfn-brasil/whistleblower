@@ -21,3 +21,4 @@ RUN chown -hR serenata_de_amor .
 USER serenata_de_amor
 
 COPY . /usr/src/app
+CMD ["celery", "-A", "whistleblower.tasks", "worker", "-B"]

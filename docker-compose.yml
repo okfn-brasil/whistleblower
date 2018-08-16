@@ -13,8 +13,7 @@ services:
       - 5672:5672
 
   worker:
-    build: .
-    command: celery -A whistleblower.tasks worker -B
+    image: serenata/whistleblower
     restart: always
     depends_on:
       - mongo
