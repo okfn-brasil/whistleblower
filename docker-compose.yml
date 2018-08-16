@@ -21,7 +21,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/usr/src/app/data
+      - /tmp/serenata-data:/usr/src/app/data
       - ./rosie:/usr/src/app/rosie
       - ./tests:/usr/src/app/tests
       - ./whistleblower:/usr/src/app/whistleblower

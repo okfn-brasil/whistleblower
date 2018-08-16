@@ -3,8 +3,8 @@ import os
 
 from pymongo import MongoClient
 
-from .suspicions import Suspicions
-from .targets.twitter import Twitter
+from whistleblower.suspicions import Suspicions
+from whistleblower.targets.twitter import Twitter
 import whistleblower.tasks
 
 MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://mongo:27017/')
