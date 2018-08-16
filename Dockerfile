@@ -1,4 +1,4 @@
-FROM python:3.6.3-alpine
+FROM python:3.6.6-alpine
 
 RUN apk add --no-cache --virtual build-base \
   && apk add --no-cache --virtual libxml2-dev \
