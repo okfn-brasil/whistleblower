@@ -28,6 +28,7 @@ class Suspicions:
         datasets.fetch(self.SOCIAL_ACCOUNTS_FILE, self.data_path)
 
     def all(self):
+        self.fetch()
         dataset = self.reimbursements()
         dataset = dataset.merge(self.__companies(),
                                 how='left',

@@ -5,6 +5,13 @@ from whistleblower.suspicions import Suspicions as subject_class
 
 
 class TestSuspicions(TestCase):
+    @mock.patch.object(subject_class, 'fetch', new_callable=mock.PropertyMock)
+    @mock.patch('whistleblower.suspicions.datasets')
+    @mock.patch('whistleblower.suspicions.pd')
+    def test_all(self, pd_mock, datasets_mock, fetch_mock):
+        subject_class().all()
+        fetch_mock.assert_called_once()
+
     @mock.patch('whistleblower.suspicions.pd')
     def test_reimbursements(self, pd_mock):
         path = 'data/reimbursements-{}.csv'
