@@ -5,4 +5,4 @@ pandas==0.23.4
 pymongo==3.7.1
 python-twitter==3.4.2
 requests==2.19.1
-serenata-toolbox==12.4.4
+serenata-toolbox
