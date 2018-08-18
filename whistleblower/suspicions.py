@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 
 import numpy as np
@@ -17,7 +18,8 @@ class Suspicions:
     CONGRESSPEOPLE_FILE = '2017-05-29-deputies.xz'
     SOCIAL_ACCOUNTS_FILE = '2018-02-05-congresspeople-social-accounts.xz'
 
-    def __init__(self, data_path=DATA_PATH):
+    def __init__(self, year=None, data_path=DATA_PATH):
+        self.year = year or dt.datetime.today().year
         self.data_path = data_path
 
     def fetch(self):
@@ -26,7 +28,8 @@ class Suspicions:
         datasets.fetch(self.SOCIAL_ACCOUNTS_FILE, self.data_path)
 
     def all(self):
-        dataset = self.__reimbursements()
+        self.fetch()
+        dataset = self.reimbursements()
         dataset = dataset.merge(self.__companies(),
                                 how='left',
                                 left_on='cnpj_cpf',
@@ -48,8 +51,9 @@ class Suspicions:
             & dataset['congressperson_id'].notnull()
         return dataset.loc[rows, dataset.notnull().any()]
 
-    def __reimbursements(self):
-        dataset = pd.read_csv(os.path.join(self.data_path, 'reimbursements.xz'),
+    def reimbursements(self):
+        path = os.path.join(self.data_path, 'reimbursements-{}.csv'.format(self.year))
+        dataset = pd.read_csv(path,
                               dtype={'applicant_id': np.str,
                                      'cnpj_cpf': np.str,
                                      'congressperson_id': np.str,
@@ -57,8 +61,6 @@ class Suspicions:
                               low_memory=False)
         dataset['issue_date'] = pd.to_datetime(
             dataset['issue_date'], errors='coerce')
-        dataset = dataset.query('year >= 2016')
-        # dataset = dataset.query('term == 2015')
         return dataset
 
     def __companies(self):

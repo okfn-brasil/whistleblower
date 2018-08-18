@@ -13,8 +13,7 @@ services:
       - 5672:5672
 
   worker:
-    build: .
-    command: celery -A whistleblower.tasks worker -B
+    image: serenata/whistleblower
     restart: always
     depends_on:
       - mongo
@@ -22,7 +21,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/usr/src/app/data
+      - /tmp/serenata-data:/usr/src/app/data
       - ./rosie:/usr/src/app/rosie
       - ./tests:/usr/src/app/tests
       - ./whistleblower:/usr/src/app/whistleblower

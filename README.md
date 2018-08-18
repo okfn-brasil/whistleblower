@@ -28,5 +28,6 @@ $ docker-compose up
 ## Testing
 
 ```console
-$ docker-compose run worker python -m unittest discover tests
+$ docker-compose run --rm worker \
+    python -m unittest discover
 ```
