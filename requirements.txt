@@ -1,8 +1,0 @@
-amqp==2.3.2
-celery==4.2.1
-ipdb==0.11
-pandas==0.23.4
-pymongo==3.7.1
-python-twitter==3.4.2
-requests==2.19.1
-serenata-toolbox
